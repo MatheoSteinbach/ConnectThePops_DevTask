@@ -6,8 +6,9 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/ConnectThePops!/Scenes/MainMenu.unity
+    path: Assets/MainGame/Scenes/MainMenu.unity
     guid: 40d2fa8f4250486419146cbc1bf3b43a
   m_configObjects:
     com.unity.adaptiveperformance.loader_settings: {fileID: 11400000, guid: 1b273cfd7eea25d409cd838645e14af8, type: 2}
+    com.unity.adaptiveperformance.samsung.android.provider_settings: {fileID: 11400000, guid: 0c4886eca4143754697824353265da27, type: 2}
     com.unity.adaptiveperformance.simulator.provider_settings: {fileID: 11400000, guid: 4ef4c928d3ae51343afd96a577c88051, type: 2}
