@@ -9,8 +9,8 @@ public class GridCell
     {
         Pos = new Vector2( _x, _y );
     }
-    public GridCell(Vector2 pos)
+    public GridCell(Vector2 _pos)
     {
-        Pos = pos;
+        Pos = _pos;
     }
 }

@@ -5,80 +5,103 @@ using System.Linq;
 
 public class GameModel
 {
+    #region VARIABLES
     public List<GridCell> grid = new List<GridCell>();
     private List<Tile> tiles = new List<Tile>();
 
     private int scorePoints;
-    private int scoreMultiplier;
-    private int currentLevel;
+    private int scoreMultiplier = 1;
+    private int currentLevel = 1;
+    private int progress;
 
     public int[] gpSeries;
     private HashSet<Tile> neighbors = new HashSet<Tile>();
     private List<Tile> connectedTiles = new List<Tile>();
-    private int mergeSumResult;
-    private int currentMergeSum;
 
     private TilesTheme currentTheme;
-
     private Tile startTile;
-    private bool canClick = true;
 
-    #region CONSTRUCTORS
-    public GameModel() 
-    {
-        
-    }
-    #endregion
+    private bool merging = false;
+    private bool canTouch = true;
 
-    public void TouchStarted(Tile tile)
+    private GridCell mergedGridCell;
+    private int mergeSumResult;
+    #endregion VARIABLES
+
+    #region PROPERTIES
+    public GridCell MergedGridCell { get => mergedGridCell; }
+    public int MergeSumResult { get => mergeSumResult; }
+    public bool Merging { get => merging; }
+    public TilesTheme CurrentTheme { get => currentTheme; }
+    public int ScorePoints { get => scorePoints;}
+    public int ScoreMultiplier { get => scoreMultiplier;}
+    public int CurrentLevel { get => currentLevel;}
+    public int Progress { get => progress;}
+    #endregion PROPERTIES
+
+    public void TouchStarted(Tile _tile)
     {
+        // Set Start Tile -> Start Tile Anim -> Check For Neighbors
+        if (!canTouch) return; 
         connectedTiles.Clear();
         neighbors.Clear();
         mergeSumResult = 0;
 
-        startTile = tile;
-        connectedTiles.Add(tile);
-        currentMergeSum = tile.Value;
-        mergeSumResult = tile.ValueId;
-        CheckForNeighbors(tile);
+        startTile = _tile;
+        _tile.Expand();
+        connectedTiles.Add(_tile);
+        mergeSumResult = _tile.ValueId;
+        CheckForNeighbors(_tile);
+        canTouch = false;
+
+        AudioManager.Instance.ConnectSound(1f);
     }
-    public void TouchIsHeld()
+
+    public void TouchIsHeld(Tile _tile)
     {
-        
+        if(canTouch) return;
+        // Check for possible connections
+        CheckForConnections(_tile);
     }
+
     public void TouchEnded()
     {
-        startTile = null;
+        if(canTouch) return ;
+        // Check if there are Connections to Merge.
         if (connectedTiles.Count > 1)
         {
-            IncreaseMatchScore(currentMergeSum);
+            IncreaseMatchScore();
+            foreach (Tile tile in connectedTiles)
+            {
+                if(tile != null)
+                {
+                    tile.Contract();
+                }
+            }
+            merging = true;
         }
         
-    }
-
-    public void OnMerge()
-    {
-        IncreaseMatchScore(currentMergeSum);
+        else if(startTile != null)
+        {
+            startTile.Contract();
+            canTouch = true;
+            merging = false;
+        }
         
-    }
-
-
-    public List<GridCell> GetListOfFreeGridCells()
-    {
-        return grid.Where(n => n.OccupiedTile == null).ToList();
+        startTile = null;
     }
 
     public void AddTile(Tile _tile, GridCell _gridCell, int _id)
     {
         _tile.SetTile(_gridCell);
-        _tile.Init(currentTheme.tilesTheme[_id], currentTheme.showText, GetValueFromGeometricSeries(_id), _id);
+        _tile.Init(CurrentTheme.tilesTheme[_id], CurrentTheme.showText, GetValueFromGeometricSeries(_id), _id);
         tiles.Add(_tile);
         _gridCell.OccupiedTile = _tile;
     }
 
-    public void SetUpValueNumbers(bool _useGS,int _count)
+    public void SetUpValueNumbers(bool _useGS, int _count)
     {
-        if(_useGS)
+        if (_useGS)
         {
             gpSeries = GeometricSeries(_count);
         }
@@ -87,15 +110,14 @@ public class GameModel
             gpSeries = NormalNumbers(_count);
         }
     }
-
-    public int GetValueFromGeometricSeries(int _id)
+    
+    public void SetCurrentTheme(TilesTheme _theme)
     {
-        return gpSeries[_id];
-    }
-
-    public void SetCurrentTheme(TilesTheme theme)
-    {
-        currentTheme = theme;
+        currentTheme = _theme;
+        foreach (var tile in tiles)
+        {
+            tile.ChangeTheme(_theme);
+        }
     }
 
     public void GenerateGrid(int _width, int _height)
@@ -114,18 +136,18 @@ public class GameModel
     {
         foreach (var tile in connectedTiles)
         {
+            if (tile == null) break;
             tiles.Remove(tile);
             tile.DeactivateLineLink();
-            tile.MoveTo(connectedTiles.Last().Pos, 0.39f);
-
-            tile.Obliterate(0.45f);
+            tile.MoveTo(connectedTiles.Last().Pos, 0.22f);
+            tile.Obliterate();
         }
+        mergedGridCell = connectedTiles.Last().GridCell;
         yield return null;
     }
 
-    public IEnumerator MakeTilesFall()
+    public IEnumerator MakeTilesFall(float _speed)
     {
-        connectedTiles.Clear();
         foreach (var gridCell in grid)
         {
             if (gridCell.OccupiedTile == null)
@@ -134,41 +156,42 @@ public class GameModel
 
                 if (gridsAbove0.Count != 0)
                 {
-                    gridsAbove0.First().OccupiedTile.MoveTo(gridCell.Pos, 0.4f);
+                    gridsAbove0.First().OccupiedTile.MoveTo(gridCell.Pos, _speed);
                     gridCell.OccupiedTile = gridsAbove0.First().OccupiedTile;
                     gridCell.OccupiedTile.SetTile(gridCell);
-                    //gridCell.OccupiedTile.GridCell = gridCell;
                     gridsAbove0.First().OccupiedTile = null;
                 }
             }
             yield return null;
         }
+        canTouch = true;
     }
 
-    private void IncreaseMatchScore(int addedScore)
+    public void FinishedMerging()
     {
-        var result = addedScore * scoreMultiplier;
+        connectedTiles.Clear();
+        merging = false;
+    }
+
+    public void IncreaseMatchScore()
+    {
+        var value = GetValueFromGeometricSeries(GetMergeValue());
+        var result = value * ScoreMultiplier;
         scorePoints += (int)result;
-        
-        // check level logic
-    }
-
-    public int GetMergeValue()
-    {
-        //CONVERT FROM ID BEFORE RETURNING
-        return mergeSumResult;
-    }
-    public List<Tile> GetConnectedTiles()
-    {
-        return connectedTiles;
-    }
-    public Tile GetStartTile()
-    {
-        return startTile;
-    }
-    public bool CheckForConnectedTiles()
-    {
-        return connectedTiles.Count > 1;
+        progress += (int)result;
+        if(progress >= 100)
+        {
+            currentLevel++;
+            progress = 0;
+            if (currentLevel == 4)
+            {
+                scoreMultiplier++;
+            }
+            else if (currentLevel == 8)
+            {
+                scoreMultiplier++;
+            }
+        }
     }
 
     private int[] GeometricSeries(int _count)
@@ -186,6 +209,7 @@ public class GameModel
         }
         return gpSeries;
     }
+
     private int[] NormalNumbers(int _count)
     {
         int[] gpSeries = new int[_count];
@@ -197,8 +221,10 @@ public class GameModel
         return gpSeries;
     }
 
-    public void CheckForPossibilities(Tile _currentTile)
+    #region PERFORMANCE KILLERS :(
+    private void CheckForConnections(Tile _currentTile)
     {
+        // Check if it's going back one tile
         if (connectedTiles.Last() != _currentTile && neighbors.Contains(_currentTile))
         {
             if (connectedTiles.Last().Value != _currentTile.Value || startTile == _currentTile && connectedTiles.Count > 2)
@@ -206,132 +232,188 @@ public class GameModel
                 return;
             }
 
-            // Check if it returns a Node
             if (connectedTiles.Count > 1)
             {
                 if (connectedTiles[connectedTiles.Count - 2] == _currentTile || startTile == _currentTile)
                 {
+                    AudioManager.Instance.ConnectSound(0.8f);
+
+                    connectedTiles.Last().Contract();
                     connectedTiles.Remove(connectedTiles.Last());
                     CheckForNeighbors(_currentTile);
-                    currentMergeSum -= _currentTile.Value;
-                    if (gpSeries.Contains(currentMergeSum) && currentMergeSum != 2)
-                    {
-                        mergeSumResult--;
-                    }
                     _currentTile.DeactivateLineLink();
 
                     return;
                 }
             }
 
-            // Check Pos of current tile to give the angle of the line of the previous tile // NEEDS REWORK
+            // Connects, sets the angle of the previous tile
             if (!connectedTiles.Contains(_currentTile))
             {
                 SetAngleToLine(_currentTile, connectedTiles.Last());
 
+                var x = (connectedTiles.Count - 1) * 0.2f;
+                AudioManager.Instance.ConnectSound(1f + x);
+
                 connectedTiles.Add(_currentTile);
+                _currentTile.Expand();
                 neighbors.Clear();
                 CheckForNeighbors(_currentTile);
-                currentMergeSum += _currentTile.Value;
-                // MergeNumber
-                if (gpSeries.Contains(currentMergeSum) && currentMergeSum != 2)
-                {
-                    mergeSumResult++;
-                }
             }
         }
         return;
     }
-
-    private void CheckForNeighbors(Tile currentTile)
+    private void CheckForNeighbors(Tile _currentTile)
     {
+        neighbors.Clear();
         foreach (var gridCell in grid)
         {
-            //NEED PERFORMANCE CHECK
+            //NEEDS PERFORMANCE CHECK
             //left
-            if (gridCell.Pos.x == currentTile.Pos.x - 1 && gridCell.Pos.y == currentTile.Pos.y)
+            if (gridCell.Pos.x == _currentTile.Pos.x - 1 && gridCell.Pos.y == _currentTile.Pos.y)
             {
                 neighbors.Add(gridCell.OccupiedTile);
             }
             //left-up
-            else if (gridCell.Pos.x == currentTile.Pos.x - 1 && gridCell.Pos.y == currentTile.Pos.y + 1)
+            else if (gridCell.Pos.x == _currentTile.Pos.x - 1 && gridCell.Pos.y == _currentTile.Pos.y + 1)
             {
                 neighbors.Add(gridCell.OccupiedTile);
             }
             //up
-            else if (gridCell.Pos.x == currentTile.Pos.x && gridCell.Pos.y == currentTile.Pos.y + 1)
+            else if (gridCell.Pos.x == _currentTile.Pos.x && gridCell.Pos.y == _currentTile.Pos.y + 1)
             {
                 neighbors.Add(gridCell.OccupiedTile);
             }
             //up-right
-            else if (gridCell.Pos.x == currentTile.Pos.x + 1 && gridCell.Pos.y == currentTile.Pos.y + 1)
+            else if (gridCell.Pos.x == _currentTile.Pos.x + 1 && gridCell.Pos.y == _currentTile.Pos.y + 1)
             {
                 neighbors.Add(gridCell.OccupiedTile);
             }
             //right
-            else if (gridCell.Pos.x == currentTile.Pos.x + 1 && gridCell.Pos.y == currentTile.Pos.y)
+            else if (gridCell.Pos.x == _currentTile.Pos.x + 1 && gridCell.Pos.y == _currentTile.Pos.y)
             {
                 neighbors.Add(gridCell.OccupiedTile);
             }
             //right-down
-            else if (gridCell.Pos.x == currentTile.Pos.x + 1 && gridCell.Pos.y == currentTile.Pos.y - 1)
+            else if (gridCell.Pos.x == _currentTile.Pos.x + 1 && gridCell.Pos.y == _currentTile.Pos.y - 1)
             {
                 neighbors.Add(gridCell.OccupiedTile);
             }
             //down
-            else if (gridCell.Pos.x == currentTile.Pos.x && gridCell.Pos.y == currentTile.Pos.y - 1)
+            else if (gridCell.Pos.x == _currentTile.Pos.x && gridCell.Pos.y == _currentTile.Pos.y - 1)
             {
                 neighbors.Add(gridCell.OccupiedTile);
             }
             //down-left
-            else if (gridCell.Pos.x == currentTile.Pos.x - 1 && gridCell.Pos.y == currentTile.Pos.y - 1)
+            else if (gridCell.Pos.x == _currentTile.Pos.x - 1 && gridCell.Pos.y == _currentTile.Pos.y - 1)
             {
                 neighbors.Add(gridCell.OccupiedTile);
             }
         }
     }
 
-    private void SetAngleToLine(Tile currentTile, Tile previousTile)
+    private void SetAngleToLine(Tile _currentTile, Tile _previousTile)
     {
+        // rip performance >_<
         //left
-        if (currentTile.Pos.x < previousTile.Pos.x && currentTile.Pos.y == previousTile.Pos.y)
+        if (_currentTile.Pos.x < _previousTile.Pos.x && _currentTile.Pos.y == _previousTile.Pos.y)
         {
-            previousTile.ActivateLineLink(90);
+            _previousTile.ActivateLineLink(90);
         }
         //left-up
-        if (currentTile.Pos.x < previousTile.Pos.x && currentTile.Pos.y > previousTile.Pos.y)
+        if (_currentTile.Pos.x < _previousTile.Pos.x && _currentTile.Pos.y > _previousTile.Pos.y)
         {
-            previousTile.ActivateLineLink(45);
+            _previousTile.ActivateLineLink(45);
         }
         //up
-        if (currentTile.Pos.x == previousTile.Pos.x && currentTile.Pos.y > previousTile.Pos.y)
+        if (_currentTile.Pos.x == _previousTile.Pos.x && _currentTile.Pos.y > _previousTile.Pos.y)
         {
-            previousTile.ActivateLineLink(0);
+            _previousTile.ActivateLineLink(0);
         }
         //up-right
-        if (currentTile.Pos.x > previousTile.Pos.x && currentTile.Pos.y > previousTile.Pos.y)
+        if (_currentTile.Pos.x > _previousTile.Pos.x && _currentTile.Pos.y > _previousTile.Pos.y)
         {
-            previousTile.ActivateLineLink(-45);
+            _previousTile.ActivateLineLink(-45);
         }
         //right
-        if (currentTile.Pos.x > previousTile.Pos.x && currentTile.Pos.y == previousTile.Pos.y)
+        if (_currentTile.Pos.x > _previousTile.Pos.x && _currentTile.Pos.y == _previousTile.Pos.y)
         {
-            previousTile.ActivateLineLink(-90);
+            _previousTile.ActivateLineLink(-90);
         }
         //right-down
-        if (currentTile.Pos.x > previousTile.Pos.x && currentTile.Pos.y < previousTile.Pos.y)
+        if (_currentTile.Pos.x > _previousTile.Pos.x && _currentTile.Pos.y < _previousTile.Pos.y)
         {
-            previousTile.ActivateLineLink(-135);
+            _previousTile.ActivateLineLink(-135);
         }
         //down
-        if (currentTile.Pos.x == previousTile.Pos.x && currentTile.Pos.y < previousTile.Pos.y)
+        if (_currentTile.Pos.x == _previousTile.Pos.x && _currentTile.Pos.y < _previousTile.Pos.y)
         {
-            previousTile.ActivateLineLink(-180);
+            _previousTile.ActivateLineLink(-180);
         }
         //down-left
-        if (currentTile.Pos.x < previousTile.Pos.x && currentTile.Pos.y < previousTile.Pos.y)
+        if (_currentTile.Pos.x < _previousTile.Pos.x && _currentTile.Pos.y < _previousTile.Pos.y)
         {
-            previousTile.ActivateLineLink(135);
+            _previousTile.ActivateLineLink(135);
         }
     }
+    #endregion PERFORMANCE KILLERS :(
+
+
+    #region POWERUPS
+    public List<int> SortTiles()
+    {
+        var itemList = (from t in tiles
+                        select t).OrderByDescending(c => c.ValueId);
+        List<int> intArray = new List<int>();
+        foreach (var item in itemList)
+        {
+            intArray.Add(item.ValueId);
+        }
+        return intArray;
+    }
+    public void IncreaseMultiplier()
+    {
+        scoreMultiplier++;
+    }
+    #endregion POWERUPS
+
+
+    #region GETTERS
+    public List<GridCell> GetListOfFreeGridCells()
+    {
+        return grid.Where(n => n.OccupiedTile == null).ToList();
+    }
+    public int GetMergeValue()
+    {
+        if (connectedTiles.Count < 4)
+        {
+            return connectedTiles[0].ValueId + 1;
+        }
+        else if (connectedTiles.Count >= 4 && connectedTiles.Count < 8)
+        {
+            return connectedTiles[0].ValueId + 2;
+        }
+        else if (connectedTiles.Count >= 8 && connectedTiles.Count < 16)
+        {
+            return connectedTiles[0].ValueId + 3;
+        }
+        return MergeSumResult;
+    }
+    public List<Tile> GetConnectedTiles()
+    {
+        return connectedTiles;
+    }
+    public Tile GetStartTile()
+    {
+        return startTile;
+    }
+    public bool CheckForConnectedTiles()
+    {
+        return connectedTiles.Count > 1;
+    }
+    public int GetValueFromGeometricSeries(int _id)
+    {
+        return gpSeries[_id];
+    }
+    #endregion GETTERS
 }

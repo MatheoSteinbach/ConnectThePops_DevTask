@@ -8,9 +8,9 @@ public class InputReader : MonoBehaviour
 
     public DefaultControls touchControls;
 
-    public delegate void StartTouchEvent(Vector2 position, float time);
+    public delegate void StartTouchEvent(Vector2 _position, float _time);
     public event StartTouchEvent OnStartTouch;
-    public delegate void EndTouchEvent(Vector2 position, float time);
+    public delegate void EndTouchEvent(Vector2 _position, float _time);
     public event EndTouchEvent OnEndTouch;
 
     private void Awake()
@@ -44,7 +44,6 @@ public class InputReader : MonoBehaviour
     private void StartTouch(InputAction.CallbackContext _context)
     {
         if (OnStartTouch != null) OnStartTouch(touchControls.Player.TouchPosition.ReadValue<Vector2>(), (float) _context.startTime);
-        Debug.Log("Meep :" + touchControls.Player.TouchPosition.ReadValue<Vector2>());
     }
     private void EndTouch(InputAction.CallbackContext _context)
     {

@@ -10,30 +10,30 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 44eeb4be2e49af545bbda7414262531b, type: 3}
-  m_Name: DefaultTheme
+  m_Name: Emojis Theme
   m_EditorClassIdentifier: 
   backgroundColor: {r: 0.8862745, g: 0.84705883, b: 0.73333335, a: 1}
-  showText: 1
+  showText: 0
   tilesTheme:
-  - sprite: {fileID: 21300000, guid: ffe19cc3f774f5f48b1070590d672d3f, type: 3}
+  - sprite: {fileID: 1502388609, guid: 2b18cd611b54e4d489658baac4ed008d, type: 3}
     color: {r: 0.9176471, g: 0.40784317, b: 0.5686275, a: 1}
-  - sprite: {fileID: 21300000, guid: ffe19cc3f774f5f48b1070590d672d3f, type: 3}
+  - sprite: {fileID: -33586444, guid: 2b18cd611b54e4d489658baac4ed008d, type: 3}
     color: {r: 0.882353, g: 0.34509805, b: 0.23137257, a: 1}
-  - sprite: {fileID: 21300000, guid: ffe19cc3f774f5f48b1070590d672d3f, type: 3}
+  - sprite: {fileID: 216568287, guid: 2b18cd611b54e4d489658baac4ed008d, type: 3}
     color: {r: 0.9921569, g: 0.7372549, b: 0.19215688, a: 1}
-  - sprite: {fileID: 21300000, guid: ffe19cc3f774f5f48b1070590d672d3f, type: 3}
+  - sprite: {fileID: -1139029963, guid: 2b18cd611b54e4d489658baac4ed008d, type: 3}
     color: {r: 0.8980393, g: 0.5058824, b: 0.23137257, a: 1}
-  - sprite: {fileID: 21300000, guid: ffe19cc3f774f5f48b1070590d672d3f, type: 3}
+  - sprite: {fileID: 1965225584, guid: 2b18cd611b54e4d489658baac4ed008d, type: 3}
     color: {r: 0.46274513, g: 0.78823537, b: 0.32156864, a: 1}
-  - sprite: {fileID: 21300000, guid: ffe19cc3f774f5f48b1070590d672d3f, type: 3}
+  - sprite: {fileID: 1155695332, guid: 2b18cd611b54e4d489658baac4ed008d, type: 3}
     color: {r: 0.30588236, g: 0.8235295, b: 0.64705884, a: 1}
-  - sprite: {fileID: 21300000, guid: ffe19cc3f774f5f48b1070590d672d3f, type: 3}
+  - sprite: {fileID: -1136705297, guid: 2b18cd611b54e4d489658baac4ed008d, type: 3}
     color: {r: 0.4156863, g: 0.74509805, b: 0.9176471, a: 1}
-  - sprite: {fileID: 21300000, guid: ffe19cc3f774f5f48b1070590d672d3f, type: 3}
+  - sprite: {fileID: 1928944049, guid: 2b18cd611b54e4d489658baac4ed008d, type: 3}
     color: {r: 0.427451, g: 0.5764706, b: 0.86274517, a: 1}
-  - sprite: {fileID: 21300000, guid: ffe19cc3f774f5f48b1070590d672d3f, type: 3}
+  - sprite: {fileID: 625412784, guid: 2b18cd611b54e4d489658baac4ed008d, type: 3}
     color: {r: 0.82745105, g: 0.57254905, b: 0.8117648, a: 1}
-  - sprite: {fileID: 21300000, guid: ffe19cc3f774f5f48b1070590d672d3f, type: 3}
+  - sprite: {fileID: -516476643, guid: 2b18cd611b54e4d489658baac4ed008d, type: 3}
     color: {r: 0.61960787, g: 0.41960788, b: 0.8000001, a: 1}
-  - sprite: {fileID: 21300000, guid: ffe19cc3f774f5f48b1070590d672d3f, type: 3}
+  - sprite: {fileID: -342618653, guid: 2b18cd611b54e4d489658baac4ed008d, type: 3}
     color: {r: 0.15803583, g: 0.14498042, b: 0.16981131, a: 1}

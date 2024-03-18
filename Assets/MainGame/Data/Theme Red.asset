@@ -10,30 +10,30 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 44eeb4be2e49af545bbda7414262531b, type: 3}
-  m_Name: DefaultTheme
+  m_Name: Theme Red
   m_EditorClassIdentifier: 
   backgroundColor: {r: 0.8862745, g: 0.84705883, b: 0.73333335, a: 1}
   showText: 1
   tilesTheme:
   - sprite: {fileID: 21300000, guid: ffe19cc3f774f5f48b1070590d672d3f, type: 3}
-    color: {r: 0.9176471, g: 0.40784317, b: 0.5686275, a: 1}
+    color: {r: 0.91764706, g: 0.40784317, b: 0.43904057, a: 1}
   - sprite: {fileID: 21300000, guid: ffe19cc3f774f5f48b1070590d672d3f, type: 3}
-    color: {r: 0.882353, g: 0.34509805, b: 0.23137257, a: 1}
+    color: {r: 0.6226415, g: 0.23724142, b: 0.15566038, a: 1}
   - sprite: {fileID: 21300000, guid: ffe19cc3f774f5f48b1070590d672d3f, type: 3}
-    color: {r: 0.9921569, g: 0.7372549, b: 0.19215688, a: 1}
+    color: {r: 0.8773585, g: 0.21207967, b: 0.16967781, a: 1}
   - sprite: {fileID: 21300000, guid: ffe19cc3f774f5f48b1070590d672d3f, type: 3}
-    color: {r: 0.8980393, g: 0.5058824, b: 0.23137257, a: 1}
+    color: {r: 0.7830189, g: 0.15143289, b: 0.2768838, a: 1}
   - sprite: {fileID: 21300000, guid: ffe19cc3f774f5f48b1070590d672d3f, type: 3}
-    color: {r: 0.46274513, g: 0.78823537, b: 0.32156864, a: 1}
+    color: {r: 0.8867924, g: 0.28496808, b: 0.06274474, a: 1}
   - sprite: {fileID: 21300000, guid: ffe19cc3f774f5f48b1070590d672d3f, type: 3}
-    color: {r: 0.30588236, g: 0.8235295, b: 0.64705884, a: 1}
+    color: {r: 0.754717, g: 0.024919916, b: 0.21553174, a: 1}
   - sprite: {fileID: 21300000, guid: ffe19cc3f774f5f48b1070590d672d3f, type: 3}
-    color: {r: 0.4156863, g: 0.74509805, b: 0.9176471, a: 1}
+    color: {r: 0.4811321, g: 0.18902664, b: 0.17928979, a: 1}
   - sprite: {fileID: 21300000, guid: ffe19cc3f774f5f48b1070590d672d3f, type: 3}
-    color: {r: 0.427451, g: 0.5764706, b: 0.86274517, a: 1}
+    color: {r: 0.745283, g: 0, b: 0.015061657, a: 1}
   - sprite: {fileID: 21300000, guid: ffe19cc3f774f5f48b1070590d672d3f, type: 3}
-    color: {r: 0.82745105, g: 0.57254905, b: 0.8117648, a: 1}
+    color: {r: 0.3018868, g: 0.04726345, b: 0.0071199704, a: 1}
   - sprite: {fileID: 21300000, guid: ffe19cc3f774f5f48b1070590d672d3f, type: 3}
-    color: {r: 0.61960787, g: 0.41960788, b: 0.8000001, a: 1}
+    color: {r: 0.22752252, g: 0.113697045, b: 0.3301887, a: 1}
   - sprite: {fileID: 21300000, guid: ffe19cc3f774f5f48b1070590d672d3f, type: 3}
     color: {r: 0.15803583, g: 0.14498042, b: 0.16981131, a: 1}
